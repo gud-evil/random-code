@@ -1,0 +1,74 @@
+#include <iostream>
+
+class A {
+private:
+    int value;
+
+public:
+    // 1. Default Constructor
+    A() : value(0) {
+        std::cout << "Default constructor called, value: " << value << std::endl;
+    }
+
+    // 2. Parameterized Constructor
+    A(int v) : value(v) {
+        std::cout << "Parameterized constructor called, value: " << value << std::endl;
+    }
+
+    // 3. Copy Constructor
+    A(const A& other) : value(other.value) {
+        std::cout << "Copy constructor called, value: " << value << std::endl;
+    }
+
+    // 4. Assignment Operator
+    A& operator=(const A& other) {
+        if (this == &other) {
+            return *this; // Handle self-assignment
+        }
+        value = other.value;
+        std::cout << "Assignment operator called, value: " << value << std::endl;
+        return *this;
+    }
+
+    // 5. Operator Overloading for + (A + A)
+    A operator+(const A& other) const {
+        A result;
+        result.value = this->value + other.value;
+        std::cout << "Operator+ (A + A) called, result value: " << result.value << std::endl;
+        return result;
+    }
+
+    // 6. Operator Overloading for + (A + int)
+    A operator+(int v) const {
+        A result;
+        result.value = this->value + v;
+        std::cout << "Operator+ (A + int) called, result value: " << result.value << std::endl;
+        return result;
+    }
+
+    // 7. Friend function for + (int + A)
+    friend A operator+(int v, const A& obj) {
+        A result;
+        result.value = v + obj.value;
+        std::cout << "Friend Operator+ (int + A) called, result value: " << result.value << std::endl;
+        return result;
+    }
+
+    // Method to print the value (optional for testing)
+    void print() const {
+        std::cout << "Value: " << value << std::endl;
+    }
+};
+
+int main() {
+    A a;
+    A a1;
+    a = a1;  
+    A a2 = a1;
+    A a3 = 10;
+    A a4 = a1 + a2;
+    A a5 = a4 + 10;
+    A a6 = 10 + a1;
+
+    return 0;
+}
