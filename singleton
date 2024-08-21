@@ -1,0 +1,40 @@
+// Online C++ compiler to run C++ program online
+#include <iostream>
+using namespace std;
+class single{
+    static single *inst;
+    int data{};
+    single(int temp):data(temp){            cout<<"\n Private param construtor---";}
+     // Delete copy constructor and assignment operator to prevent copying
+    single(const single&) = delete;
+    single& operator=(const single&) = delete;
+public:
+    static single* getinstance(int temp=0){
+        if(inst== nullptr){
+            inst= new single(temp);
+            cout<<"\n creating class object first time---";
+            return inst;
+        }
+        else{
+            cout<<"\n return existing class object---";
+            return inst;
+        }            
+    }
+    void set(int temp){data=temp;}
+    void print(){
+        cout<<"\n Inside Print function--- data:"<<data;
+    } 
+};
+single* single::inst=nullptr;
+int main() {
+    single *s1=single::getinstance(10);
+    s1->print();
+    single *s2=single::getinstance();
+    s2->print();
+    cout<<"\nAfter---";
+    s1->set(99);
+    s1->print();
+    s2->print();
+    
+    return 0;
+}
