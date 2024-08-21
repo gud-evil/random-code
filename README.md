@@ -2,6 +2,8 @@
 # This is just a place to put my learning, sample, and test code
 # Notes
 
+https://stackoverflow.com/questions/17815895/can-i-edit-two-files-then-make-one-commit-using-github-web-based-editor
+
 There is a web-based workaround:
 
 Create a temporary branch, switch to it;
