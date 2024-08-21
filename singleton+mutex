@@ -1,0 +1,58 @@
+#include <iostream>
+#include <mutex>
+
+class Singleton {
+private:
+    static Singleton* instance;  // Pointer to the Singleton instance
+    static std::mutex mutex;     // Mutex to ensure thread safety
+
+    // Private Constructor
+    Singleton() {
+        std::cout << "Singleton Constructor Called" << std::endl;
+    }
+
+    // Private Destructor
+    ~Singleton() {
+        std::cout << "Singleton Destructor Called" << std::endl;
+    }
+
+    // Delete copy constructor and assignment operator to prevent copying
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+public:
+    // Static method to access the Singleton instance
+    static Singleton* getInstance() {
+        // Double-checked locking pattern to ensure thread safety and avoid unnecessary locking
+        if (instance == nullptr) {
+            std::lock_guard<std::mutex> lock(mutex);  // Lock the mutex during instance creation
+            if (instance == nullptr) {
+                instance = new Singleton();
+            }
+        }
+        return instance;
+    }
+
+    // Method to demonstrate functionality
+    void showMessage() const {
+        std::cout << "Hello from the Singleton instance!" << std::endl;
+    }
+};
+
+// Initialize static members
+Singleton* Singleton::instance = nullptr;
+std::mutex Singleton::mutex;
+
+int main() {
+    // Access the Singleton instance and call a method
+    Singleton* s1 = Singleton::getInstance();
+    s1->showMessage();
+
+    // Verify that only one instance exists
+    Singleton* s2 = Singleton::getInstance();
+    if (s1 == s2) {
+        std::cout << "Both instances are the same, Singleton works!" << std::endl;
+    }
+
+    return 0;
+}
