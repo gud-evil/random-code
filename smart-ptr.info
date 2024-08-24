@@ -1,0 +1,83 @@
+Smart pointers
+
+
+Smart pointers are a feature in C++ that provide automatic memory management, helping developers avoid common issues like memory leaks, dangling pointers, and double deletions. They are part of the C++ Standard Library and are found in the <memory> header. Smart pointers ensure that the memory they point to is properly cleaned up when it is no longer needed, by automatically calling delete on the managed object when appropriate.
+
+Types of Smart Pointers:
+std::unique_ptr:
+
+A smart pointer that owns a resource exclusively. Only one unique_ptr can point to a given resource at any time.
+When the unique_ptr goes out of scope, the resource it manages is automatically destroyed.
+You cannot copy a unique_ptr, but you can transfer ownership using std::move.
+cpp
+Copy code
+#include <memory>
+#include <iostream>
+
+void useUniquePtr() {
+    std::unique_ptr<int> ptr1 = std::make_unique<int>(10);
+    std::cout << "Value: " << *ptr1 << std::endl;
+
+    // Transferring ownership
+    std::unique_ptr<int> ptr2 = std::move(ptr1);
+    if (!ptr1) {
+        std::cout << "ptr1 is now null" << std::endl;
+    }
+}
+std::shared_ptr:
+
+A smart pointer that manages shared ownership of a resource. Multiple shared_ptr instances can point to the same resource.
+The resource is only destroyed when the last shared_ptr pointing to it is destroyed or reset.
+shared_ptr uses reference counting to keep track of how many shared_ptr instances share ownership of the resource.
+cpp
+Copy code
+#include <memory>
+#include <iostream>
+
+void useSharedPtr() {
+    std::shared_ptr<int> ptr1 = std::make_shared<int>(20);
+    std::shared_ptr<int> ptr2 = ptr1;  // Shared ownership
+
+    std::cout << "Value: " << *ptr1 << ", Count: " << ptr1.use_count() << std::endl;
+}
+std::weak_ptr:
+
+
+A smart pointer that holds a non-owning ("weak") reference to a resource managed by shared_ptr.
+It is used to break circular references that can lead to memory leaks.
+weak_ptr does not affect the reference count of the shared_ptr and needs to be converted to shared_ptr using lock() before the resource can be accessed.
+cpp
+Copy code
+
+#include <memory>
+#include <iostream>
+
+void useWeakPtr() {
+    std::shared_ptr<int> ptr1 = std::make_shared<int>(30);
+    std::weak_ptr<int> weakPtr = ptr1;
+
+    if (auto sptr = weakPtr.lock()) {  // Convert weak_ptr to shared_ptr
+        std::cout << "Value: " << *sptr << std::endl;
+    } else {
+        std::cout << "Resource no longer exists" << std::endl;
+    }
+}
+
+Key Advantages of Smart Pointers:
+Automatic Memory Management: Smart pointers automatically release resources when they are no longer needed, reducing the risk of memory leaks.
+Exception Safety: Smart pointers clean up resources even in the presence of exceptions, making the code more robust.
+Ease of Use: Smart pointers provide a convenient and safer alternative to raw pointers, with the same level of control over dynamic memory allocation.
+When to Use Smart Pointers:
+std::unique_ptr: Use when you want sole ownership of a resource and no need to share it with other parts of the program.
+std::shared_ptr: Use when you need shared ownership of a resource, and multiple parts of the program need to access and manage the same resource.
+std::weak_ptr: Use when you need to reference a resource managed by a shared_ptr without affecting its lifetime, typically to avoid cyclic dependencies.
+Smart Pointers vs. Raw Pointers:
+Raw pointers provide no ownership semantics and require explicit management of the memory they point to (i.e., manual calls to new and delete).
+Smart pointers encapsulate ownership semantics, making memory management more predictable and safer by automating the process of freeing memory when it is no longer in use.
+By using smart pointers, you can write more reliable, maintainable, and safe C++ code, especially in applications that require dynamic memory management.
+
+
+
+
+
+
