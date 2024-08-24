@@ -1,0 +1,57 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <vector>
+
+class Semaphore {
+public:
+    Semaphore(int count = 0) : count(count) {}
+
+    void acquire() {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this]() { return count > 0; });
+        --count;
+    }
+
+    void release() {
+        std::unique_lock<std::mutex> lock(mtx);
+        ++count;
+        cv.notify_one();
+    }
+
+private:
+    std::mutex mtx;
+    std::condition_variable cv;
+    int count;
+};
+
+Semaphore sem(3);  // Initialize semaphore with a count of 3
+
+void access_critical_section(int id) {
+    sem.acquire();  // Wait (decrement the semaphore)
+    std::cout << "Thread " << id << " entered the critical section.\n";
+
+    // Simulate work in the critical section
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    std::cout << "Thread " << id << " leaving the critical section.\n";
+    sem.release();  // Signal (increment the semaphore)
+}
+
+int main() {
+    const int num_threads = 10;
+    std::vector<std::thread> threads;
+
+    // Launching 10 threads
+    for (int i = 0; i < num_threads; ++i) {
+        threads.emplace_back(access_critical_section, i + 1);
+    }
+
+    // Wait for all threads to finish
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    return 0;
+}

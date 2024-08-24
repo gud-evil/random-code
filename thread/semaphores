@@ -1,0 +1,25 @@
+#include <semaphore>
+#include <iostream>
+#include <thread>
+
+std::counting_semaphore<2> sem(2);  // Allow 2 threads to enter
+
+void task(int id) {
+    sem.acquire();
+    std::cout << "Thread " << id << " entered critical section\n";
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cout << "Thread " << id << " leaving critical section\n";
+    sem.release();
+}
+
+int main() {
+    std::thread t1(task, 1);
+    std::thread t2(task, 2);
+    std::thread t3(task, 3);
+
+    t1.join();
+    t2.join();
+    t3.join();
+
+    return 0;
+}

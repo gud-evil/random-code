@@ -1,0 +1,57 @@
+//thread with  lock free, atomic
+#include <iostream>
+#include <thread>
+#include <vector>
+#include <atomic>
+#include <string>
+
+std::atomic<int> current_thread(0); // Atomic variable to keep track of the current thread
+
+void print_chars(const std::string& input, int char_count, int thread_id, int num_threads) {
+    int n = input.size();
+    int idx = thread_id * char_count;
+    
+    while (true) {
+        // Busy-wait until it's this thread's turn
+        while (current_thread.load() != thread_id) {}
+
+        // Print the assigned number of characters
+        for (int i = 0; i < char_count; ++i) {
+            std::cout << input[(idx + i) % n];
+        }
+        std::cout << std::endl;
+
+        // Move to the next position in the string
+        idx = (idx + num_threads * char_count) % n;
+
+        // Update the current thread to the next one in the sequence
+        current_thread.store((thread_id + 1) % num_threads);
+    }
+}
+
+int main(int argc, char* argv[]) {
+    if (argc != 4) {
+        std::cerr << "Usage: " << argv[0] << " <string> <char_count> <thread_count>" << std::endl;
+        return 1;
+    }
+
+    std::string input = argv[1];
+    int char_count = std::stoi(argv[2]);
+    int num_threads = std::stoi(argv[3]);
+
+    std::vector<std::thread> threads;
+
+    std::cout << "Using " << num_threads << " threads to print " << input << " alternatively in set of " << char_count << " chars" << std::endl;
+
+    // Create threads
+    for (int i = 0; i < num_threads; ++i) {
+        threads.emplace_back(print_chars, std::ref(input), char_count, i, num_threads);
+    }
+
+    // Join threads (though they'll run indefinitely in this example)
+    for (auto& th : threads) {
+        th.join();
+    }
+
+    return 0;
+}
